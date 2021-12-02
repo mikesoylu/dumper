@@ -1,10 +1,7 @@
 
 /* IMPORT */
 
-import * as fs from 'fs';
 import mime2ext from 'mime2ext';
-import * as path from 'path';
-import {Stats} from './types';
 import Config from './config';
 import html2markdown from './html2markdown';
 
@@ -77,84 +74,6 @@ const Utils = {
     isImage ( type: string ): boolean {
 
       return type.includes ( 'image' );
-
-    }
-
-  },
-
-  system: {
-
-    getMaxHeapSize: (): number => {
-
-      try {
-
-        return performance['memory'].jsHeapSizeLimit;
-
-      } catch {
-
-        return 2197815296; // Hard-coded for better web compatibility, source: "require ( 'v8' ).getHeapStatistics ().heap_size_limit"
-
-      }
-
-    },
-
-  },
-
-  file: {
-
-    checkSize ( filePath: string ): Promise<void> {
-
-      return Utils.file.stats ( filePath ).then ( stats => {
-
-        if ( stats.size < ( Utils.system.getMaxHeapSize () * .75 ) ) return;
-
-        throw new Error ( 'File too large, try splitting it into smaller ones' );
-
-      });
-
-    },
-
-    async read ( filePath: string ): Promise<Buffer> {
-
-      await Utils.file.checkSize ( filePath );
-
-      return new Promise ( ( resolve, reject ) => {
-
-        fs.readFile ( filePath, ( err, data ) => {
-
-          if ( err ) return reject ( err );
-
-          resolve ( data );
-
-        });
-
-      });
-
-    },
-
-    stats ( filePath: string ): Promise<Stats> {
-
-      return new Promise ( ( resolve, reject ) => {
-
-        fs.stat ( filePath, ( err, stats ) => {
-
-          if ( err ) return reject ( err );
-
-          resolve ( stats );
-
-        });
-
-      });
-
-    }
-
-  },
-
-  path: {
-
-    name ( filePath: string ): string {
-
-      return path.basename ( filePath, path.extname ( filePath ) );
 
     }
 

@@ -13,6 +13,7 @@
     "compile": "tsc --skipLibCheck && tstei",
     "compile:watch": "tsc --skipLibCheck --watch",
     "test": "node ./test/index.js",
+    "prepare": "npm run clean && npm run compile",
     "prepublishOnly": "npm run clean && npm run compile && npm run test"
   },
   "bugs": {
@@ -39,6 +40,7 @@
     "cson2json": "^1.0.0",
     "entities-decode": "^1.0.0",
     "fast-xml-parser": "3.17.4",
+    "hash-wasm": "^4.9.0",
     "mime2ext": "^1.0.0",
     "sanitize-basename": "^1.0.0",
     "type-fest": "^0.17.0"

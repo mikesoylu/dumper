@@ -89,9 +89,9 @@ function html2markdown ( html: string, options?: Options ): string {
       const filename = `${hash}${Utils.mime.inferExtension ( type )}`;
       const isImage = Utils.mime.isImage ( type );
       if ( isImage ) {
-        return `<img src="@attachment/${filename}" />`;
+        return `![](${filename})`;
       } else  {
-        return `<a href="@attachment/${filename}">${filename}</a>`;
+        return `[][${filename}](${filename})`;
       }
     }
   });

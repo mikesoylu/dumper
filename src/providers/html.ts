@@ -15,7 +15,6 @@ type AttachmentRaw = undefined;
 class HTMLProvider extends AbstractProvider<NoteRaw, AttachmentRaw> {
 
   name = 'HTML';
-  extensions = ['.html', '.htm'];
 
 }
 
@@ -31,7 +30,7 @@ class HTMLNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 
   formatContent ( content: Content, metadata: NoteMetadata ): Content {
 
-    return Buffer.from ( Utils.format.html.convert ( content.toString (), metadata.title ) );
+    return Utils.format.html.convert ( content, metadata.title );
 
   }
 

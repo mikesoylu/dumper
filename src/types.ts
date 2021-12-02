@@ -1,7 +1,6 @@
 
 /* IMPORT */
 
-import {Stats} from 'fs';
 import {Class, Promisable} from 'type-fest';
 
 /* TYPES */
@@ -41,16 +40,16 @@ type NoteMetadata = {
 
 type Dump = ( note: Note ) => Promisable<void>;
 
-type Source = string | Buffer;
+type Source = string;
 
 type SourceDetails = {
-  stats?: Stats,
   filePath?: string
 };
 
-type Content = Buffer;
+type Content = string;
 
 type Options = {
+  provider: string,
   DOMParser?: DOMParser,
   source: Source | Source[],
   dump: Dump
@@ -58,4 +57,4 @@ type Options = {
 
 /* EXPORT */
 
-export {DOMParser, Attachment, AttachmentMetadata, Note, NoteMetadata, Dump, Source, SourceDetails, Class, Content, Stats, Options};
+export {DOMParser, Attachment, AttachmentMetadata, Note, NoteMetadata, Dump, Source, SourceDetails, Class, Content, Options};

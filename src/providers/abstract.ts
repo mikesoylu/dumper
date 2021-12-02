@@ -13,7 +13,6 @@ import Utils from '../utils';
 abstract class AbstractProvider<NoteRaw, AttachmentRaw> {
 
   abstract name: string;
-  abstract extensions: string[];
 
   note: AbstractNote<NoteRaw, AttachmentRaw>;
   attachment: AbstractAttachment<NoteRaw, AttachmentRaw>;
@@ -27,18 +26,11 @@ abstract class AbstractProvider<NoteRaw, AttachmentRaw> {
 
   }
 
-  isSupported ( source: Source ): boolean {
-
-    return Utils.lang.isString ( source ) && !!this.extensions.find ( ext => source.endsWith ( ext ) );
-
-  }
-
   async getDetails ( source: Source ): Promise<SourceDetails> {
 
     if ( !Utils.lang.isString ( source ) ) return {};
 
     return {
-      stats: await Utils.file.stats ( source ),
       filePath: source
     };
 
@@ -46,9 +38,7 @@ abstract class AbstractProvider<NoteRaw, AttachmentRaw> {
 
   getContent ( source: Source ): Promisable<Content> {
 
-    if ( Utils.lang.isBuffer ( source ) ) return source;
-
-    return Utils.file.read ( source );
+    return source;
 
   }
 
@@ -97,9 +87,9 @@ class AbstractNote<NoteRaw, AttachmentRaw> {
 
   sanitizeMetadata ( metadata: Partial<NoteMetadata>, details: SourceDetails ): NoteMetadata {
 
-    const created = Utils.lang.isDateValid ( metadata.created ) ? metadata.created : ( details.stats ? details.stats.birthtime : new Date () ),
-          modified = Utils.lang.isDateValid ( metadata.modified ) ? metadata.modified : ( details.stats ? details.stats.mtime : created ),
-          titleFallback = details.filePath ? sanitize ( Utils.path.name ( details.filePath ) ) || Config.note.defaultTitle : Config.note.defaultTitle;
+    const created = Utils.lang.isDateValid ( metadata.created ) ? metadata.created : new Date () ,
+          modified = Utils.lang.isDateValid ( metadata.modified ) ? metadata.modified :  created,
+          titleFallback = details.filePath ? sanitize ( details.filePath ) || Config.note.defaultTitle : Config.note.defaultTitle;
 
     return {
       title: metadata.title ? sanitize ( decode ( String ( metadata.title ) ).trim () ) || titleFallback : titleFallback,
@@ -127,7 +117,7 @@ class AbstractNote<NoteRaw, AttachmentRaw> {
 
   formatContent ( content: Content, metadata: NoteMetadata ): Promisable<Content> {
 
-    return Buffer.from ( content.toString ().trim () );
+    return content.trim ();
 
   }
 
