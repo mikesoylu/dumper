@@ -2,7 +2,7 @@
 /* IMPORT */
 
 import Config from './config';
-import {Enex, HTML} from './providers';
+import { Enex, HTML } from './providers';
 import { Options } from './types';
 import Utils from './utils';
 

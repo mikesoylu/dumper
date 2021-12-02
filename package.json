@@ -37,6 +37,7 @@
     "attachments"
   ],
   "dependencies": {
+    "apple-notes-jxa": "^1.3.0",
     "cson2json": "^1.0.0",
     "entities-decode": "^1.0.0",
     "fast-xml-parser": "3.17.4",

@@ -57,8 +57,15 @@ const Utils = {
 
       return Array.from ( str.matchAll ( re ) );
 
-    }
+    },
 
+    atob: (b64Encoded:string) => {
+      try {
+        return atob(b64Encoded);
+      } catch (err) {
+        return Buffer.from(b64Encoded, 'base64');
+      }
+    }
   },
 
   mime: {

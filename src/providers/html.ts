@@ -1,14 +1,19 @@
 
 /* IMPORT */
 
-import {NoteMetadata, Content} from '../types';
+import {NoteMetadata, Content, AttachmentMetadata} from '../types';
 import Utils from '../utils';
-import {AbstractProvider, AbstractNote} from './abstract';
+import {AbstractProvider, AbstractNote, AbstractAttachment} from './abstract';
 
 /* TYPES */
 
 type NoteRaw = Buffer;
-type AttachmentRaw = undefined;
+type AttachmentRaw = {
+  data: string;
+  mime: string;
+};
+
+const B64_REX = /data:(\w+\/\w+);base64,([^"]*)/g;
 
 /* HTML */
 
@@ -20,17 +25,59 @@ class HTMLProvider extends AbstractProvider<NoteRaw, AttachmentRaw> {
 
 class HTMLNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 
-  getMetadata ( note: NoteRaw ): Partial<NoteMetadata> {
+  async getMetadata ( note: NoteRaw ): Promise<Partial<NoteMetadata>> {
+    const resources:any[] = [];
+
+    note.toString().replace(B64_REX, (_, mime: string, data: string) => {
+      resources.push({
+        mime: mime.trim(),
+        data: data.trim()
+      });
+      return _;
+    });
 
     return {
-      title: Utils.format.html.inferTitle ( note.toString () )
+      title: Utils.format.html.inferTitle ( note.toString () ),
+      attachments: Utils.lang.flatten ( await Promise.all ( resources.map ( resource => this.provider.attachment.get ( resource ) ) ) ),
     };
 
   }
 
-  formatContent ( content: Content, metadata: NoteMetadata ): Content {
+  async formatContent ( content: Content, metadata: NoteMetadata ): Promise<string> {
 
-    return Utils.format.html.convert ( content, metadata.title );
+    const res = content.replace(B64_REX, (_, mime, data) => {
+      const hash = data.substring(0, 32);
+      return `${hash}${Utils.mime.inferExtension ( mime )}`;
+    });
+
+    return Utils.format.html.convert ( res, metadata.title );
+
+  }
+
+}
+
+class HTMLAttachment extends AbstractAttachment<NoteRaw, AttachmentRaw> {
+
+  async getMetadata ( attachment: AttachmentRaw ): Promise<Partial<AttachmentMetadata>[]> {
+    const hash = attachment.data.substring(0, 32);
+
+    const metadatas: Partial<AttachmentMetadata>[] = [],
+          mime = attachment.mime,
+          name = `${hash}${Utils.mime.inferExtension ( attachment.mime )}`;
+
+    if ( name ) {
+
+      metadatas.push ({ name, mime });
+
+    }
+
+    return metadatas;
+
+  }
+
+  getContent ( attachment: AttachmentRaw ): Content {
+
+    return attachment.data;
 
   }
 
@@ -38,5 +85,5 @@ class HTMLNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 
 /* EXPORT */
 
-export {HTMLProvider, HTMLNote};
-export default new HTMLProvider ( HTMLNote );
+export {HTMLProvider, HTMLNote, HTMLAttachment};
+export default new HTMLProvider ( HTMLNote, HTMLAttachment );

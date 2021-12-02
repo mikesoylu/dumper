@@ -6,14 +6,6 @@ import {AttachmentMetadata, NoteMetadata, Content} from '../types';
 import Utils from '../utils';
 import {AbstractProvider, AbstractNote, AbstractAttachment} from './abstract';
 
-const universalAtob = (b64Encoded:string) => {
-  try {
-    return atob(b64Encoded);
-  } catch (err) {
-    return Buffer.from(b64Encoded, 'base64');
-  }
-};
-
 /* TYPES */
 
 type XML = any;
@@ -70,9 +62,9 @@ class EnexNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 
   }
 
-  formatSourceUrl ( content: string, sourceUrl: string ): string {
+  formatTags ( content: string, tags: string[] ): string {
 
-    return `${content.trim ()}\n\n---\n\n> Source: ${sourceUrl}`;
+    return `${content.trim ()}\n\n#${tags.join(" #")}`;
 
   }
 
@@ -80,7 +72,7 @@ class EnexNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 
     let str = Utils.format.html.convert ( content.toString (), metadata.title );
 
-    if ( metadata.sourceUrl ) str = this.formatSourceUrl ( str, metadata.sourceUrl );
+    if ( metadata.tags?.length > 0 ) str = this.formatTags ( str, metadata.tags );
 
     return str;
 
@@ -91,7 +83,7 @@ class EnexNote extends AbstractNote<NoteRaw, AttachmentRaw> {
 class EnexAttachment extends AbstractAttachment<NoteRaw, AttachmentRaw> {
 
   async getMetadata ( attachment: AttachmentRaw ): Promise<Partial<AttachmentMetadata>[]> {
-    const hash = await md5(universalAtob(attachment.data));
+    const hash = await md5( Utils.lang.atob( attachment.data ) );
 
     const metadatas: Partial<AttachmentMetadata>[] = [],
           mime = attachment.mime,
