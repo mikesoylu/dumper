@@ -21,7 +21,8 @@ function html2markdown ( html: string, options?: Options ): string {
              .replace ( /<div>(\s*)<\/div>/g, '' ) // Remove empty divs
              .replace ( /(<div>(\s*)<br ?\/>(\s*)<\/div>){2,}/g, '<div><br /></div>' ); // Remove extra line breaks
 
-  html = html.replace ( /<en-media([^>]+)><\/en-media>/g, '<div node="EN-MEDIA"$1>placeholder</div>' ); // Preserving `<en-media>`
+  html = html.replace ( /<en-media([^>]+)><\/en-media>/g, '<div node="EN-MEDIA"$1>placeholder</div>' ) // Preserving `<en-media>`
+             .replace ( /<en-media([^>]+)\/>/g, '<div node="EN-MEDIA"$1>placeholder</div>' ); // Preserving `<en-media>`
 
   html = html.replace ( /<en-todo checked="true"(.*?)\/?>/g, '<input type="checkbox" checked />' ) // Replace enex checked checkbox
              .replace ( /<en-todo checked="false"(.*?)\/?>/g, '<input type="checkbox" />' ) // Replace enex unchecked checkbox
